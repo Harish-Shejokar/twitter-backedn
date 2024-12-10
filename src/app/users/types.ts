@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.types = void 0;
-exports.types = `graphql
+export const types = `#graphql
 
     type User {
         id : ID!
@@ -11,4 +8,4 @@ exports.types = `graphql
         profileImageUrl : String
     }
 
-`;
+`
