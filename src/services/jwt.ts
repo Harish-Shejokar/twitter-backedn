@@ -15,8 +15,13 @@ const jwtSecret = process.env.JWT_SECRET as string;
     }
 
     public static decodeToken(token : string){
+       try {
         const payload = JWT.verify(token , jwtSecret) as JWTUser;
         return payload;
+       } catch (error) {
+          console.log(error);
+          return null;
+       }
     }
 }
 

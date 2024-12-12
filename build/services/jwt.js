@@ -15,8 +15,14 @@ class JWTServices {
         return token;
     }
     static decodeToken(token) {
-        const payload = jsonwebtoken_1.default.verify(token, jwtSecret);
-        return payload;
+        try {
+            const payload = jsonwebtoken_1.default.verify(token, jwtSecret);
+            return payload;
+        }
+        catch (error) {
+            console.log(error);
+            return null;
+        }
     }
 }
 exports.default = JWTServices;
