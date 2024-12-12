@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 const axios_1 = __importDefault(require("axios"));
 const db_1 = require("../../clients/db");
+const jwt_1 = __importDefault(require("../../services/jwt"));
 const queries = {
     verifyGoogleToken: (parent_1, _a) => __awaiter(void 0, [parent_1, _a], void 0, function* (parent, { token }) {
         const googleToken = token;
@@ -26,23 +27,33 @@ const queries = {
         if (!(data === null || data === void 0 ? void 0 : data.email)) {
             throw new Error("Email not found");
         }
-        if (data.email) {
-            const user = yield db_1.prismaClient.user.findUnique({
-                where: { email: data.email },
+        const user = yield db_1.prismaClient.user.findUnique({
+            where: { email: data.email },
+        });
+        if (!user) {
+            yield db_1.prismaClient.user.create({
+                data: {
+                    email: data.email,
+                    firstName: data.given_name,
+                    lastName: data.family_name,
+                    profileImageUrl: data.picture,
+                }
             });
-            console.log(user);
-            if (!user) {
-                yield db_1.prismaClient.user.create({
-                    data: {
-                        email: data.email,
-                        firstName: data.given_name,
-                        lastName: data.family_name,
-                        profileImageUrl: data.picture,
-                    }
-                });
-            }
         }
-        return "ok";
+        const userInDb = yield db_1.prismaClient.user.findUnique({ where: { email: data.email } });
+        if (!userInDb) {
+            throw new Error("User not find with Email");
+        }
+        const userToken = jwt_1.default.genrateTokenForUser(userInDb);
+        return userToken;
+    }),
+    getCurrentUser: (parent, args, ctx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        console.log("*******", ctx);
+        const id = (_a = ctx === null || ctx === void 0 ? void 0 : ctx.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!id)
+            return null;
+        // return ctx.user;
     })
 };
 exports.resolvers = { queries };

@@ -1,6 +1,8 @@
 
 import axios from "axios";
 import { prismaClient } from "../../clients/db";
+import JWTServices from "../../services/jwt";
+import { GraphqlContext } from "../interfaces";
 
 interface GoogleTokenResult {
     iss?: string
@@ -32,33 +34,41 @@ const queries = {
             responseType: 'json'
         })
 
-        if ( !data?.email ) {
+        if (!data?.email) {
             throw new Error("Email not found");
         }
-        
-        if (data.email) {
-            const user = await prismaClient.user.findUnique({
-                where : {email : data.email},
-            })
-            console.log(user);
 
-            if(!user){
+        
+            const user = await prismaClient.user.findUnique({
+                where: { email: data.email },
+            })
+            
+            if (!user) {
                 await prismaClient.user.create({
-                    data : {
-                        email : data.email,
-                        firstName : data.given_name,
-                        lastName : data.family_name,
-                        profileImageUrl : data.picture,
+                    data: {
+                        email: data.email,
+                        firstName: data.given_name,
+                        lastName: data.family_name,
+                        profileImageUrl: data.picture,
                     }
                 })
             }
-       }
+            const userInDb = await prismaClient.user.findUnique({where: {email : data.email}});
+            if(!userInDb){
+                throw new Error("User not find with Email");
+            }
+            const userToken =  JWTServices.genrateTokenForUser(userInDb);
 
-        
 
+        return userToken;
+    },
 
-        return "ok";
+    getCurrentUser : async (parent:any, args: any, ctx: GraphqlContext) => {
+        console.log("*******",ctx);
+        const id = ctx?.user?.id;
+        if(!id) return null;
+        // return ctx.user;
     }
-}
+ }
 
 export const resolvers = { queries };
