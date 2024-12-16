@@ -14,7 +14,6 @@ export async function initServer() {
   const graphqlServer = new ApolloServer<GraphqlContext>({
 
     typeDefs: `
-    
         ${User.types}
 
         type Query {
@@ -32,9 +31,9 @@ export async function initServer() {
   // instance before passing the instance to `expressMiddleware`
   await graphqlServer.start();
 
-  app.use("/graphql", expressMiddleware(graphqlServer , {
+  app.use("/graphql", expressMiddleware(graphqlServer, {
     context: async ({ req, res }) => {
-      return { user : req.headers.authorization ? JWTServices.decodeToken(req.headers.authorization) : undefined } ;
+      return { user: req.headers.authorization ? JWTServices.decodeToken(req.headers.authorization.split('Bearer ')[1]) : undefined };
     },
   }));
 

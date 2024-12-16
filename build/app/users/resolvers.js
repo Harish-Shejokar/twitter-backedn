@@ -49,11 +49,12 @@ const queries = {
     }),
     getCurrentUser: (parent, args, ctx) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
-        console.log("*******", ctx);
         const id = (_a = ctx === null || ctx === void 0 ? void 0 : ctx.user) === null || _a === void 0 ? void 0 : _a.id;
         if (!id)
             return null;
-        // return ctx.user;
+        const user = yield db_1.prismaClient.user.findUnique({ where: { id } });
+        console.log('user------', user);
+        return user;
     })
 };
 exports.resolvers = { queries };
