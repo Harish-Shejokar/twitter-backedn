@@ -19,10 +19,10 @@ const jwt_1 = __importDefault(require("../../services/jwt"));
 const queries = {
     verifyGoogleToken: (parent_1, _a) => __awaiter(void 0, [parent_1, _a], void 0, function* (parent, { token }) {
         const googleToken = token;
-        const googleOauthUrl = new URL('https://oauth2.googleapis.com/tokeninfo');
-        googleOauthUrl.searchParams.set('id_token', googleToken);
+        const googleOauthUrl = new URL("https://oauth2.googleapis.com/tokeninfo");
+        googleOauthUrl.searchParams.set("id_token", googleToken);
         const { data } = yield axios_1.default.get(googleOauthUrl.toString(), {
-            responseType: 'json'
+            responseType: "json",
         });
         if (!(data === null || data === void 0 ? void 0 : data.email)) {
             throw new Error("Email not found");
@@ -55,6 +55,6 @@ const queries = {
         const user = yield db_1.prismaClient.user.findUnique({ where: { id } });
         console.log('user------', user);
         return user;
-    })
+    }),
 };
 exports.resolvers = { queries };
