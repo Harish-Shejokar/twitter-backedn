@@ -16,8 +16,6 @@ class JWTServices {
     }
     static decodeToken(token) {
         try {
-            console.log('tokrn', token);
-            console.log('jwtSecret', jwtSecret);
             const payload = jsonwebtoken_1.default.verify(token, jwtSecret);
             return payload;
         }
