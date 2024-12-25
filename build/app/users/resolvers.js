@@ -37,10 +37,12 @@ const queries = {
                     firstName: data.given_name,
                     lastName: data.family_name,
                     profileImageUrl: data.picture,
-                }
+                },
             });
         }
-        const userInDb = yield db_1.prismaClient.user.findUnique({ where: { email: data.email } });
+        const userInDb = yield db_1.prismaClient.user.findUnique({
+            where: { email: data.email },
+        });
         if (!userInDb) {
             throw new Error("User not find with Email");
         }
