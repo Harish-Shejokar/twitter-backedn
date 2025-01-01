@@ -1,23 +1,39 @@
-import { PrismaClient } from "@prisma/client";
+import { Tweet } from "@prisma/client";
+import { prismaClient } from "../../clients/db";
 import { GraphqlContext } from "../interfaces";
 
 interface CreateTweetPayload  {
     content: string
-    imageUrl : string?
+    imageUrl? : string
 }
 
-export const mutation = {
+const queries = {
+    getAllTweets : async ()=> prismaClient.tweet.findMany({orderBy : {createdAt:"desc"}})
+}
+
+const mutations = {
     createTweet: async (parent: any, { payload }: { payload: CreateTweetPayload }, ctx: GraphqlContext) => {
         if (!ctx.user) {
             throw new Error(`You are not Authenticated`);
         }
 
-        await PrismaClient.tweet.create({
+       const tweet =  await prismaClient.tweet.create({
             data: {
-                content: payload?.content,
-                imageUrl: payload?.imageUrl,
+                content: payload.content,
+                imageUrl: payload.imageUrl,
                 author: { connect: { id : ctx.user.id}},
             }
-        })
+       })
+        
+        return tweet;
     }
 }
+
+const extraResolvers = {
+    Tweet: {
+        author : (parent : Tweet) => prismaClient.user.findUnique({where : {id : parent.authorId}}),
+    }
+}
+
+
+export const resolvers = {mutations, extraResolvers, queries}

@@ -9,19 +9,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mutation = void 0;
-const client_1 = require("@prisma/client");
-exports.mutation = {
+exports.resolvers = void 0;
+const db_1 = require("../../clients/db");
+const queries = {
+    getAllTweets: () => __awaiter(void 0, void 0, void 0, function* () { return db_1.prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }); })
+};
+const mutations = {
     createTweet: (parent_1, _a, ctx_1) => __awaiter(void 0, [parent_1, _a, ctx_1], void 0, function* (parent, { payload }, ctx) {
         if (!ctx.user) {
             throw new Error(`You are not Authenticated`);
         }
-        yield client_1.PrismaClient.tweet.create({
+        const tweet = yield db_1.prismaClient.tweet.create({
             data: {
-                content: payload === null || payload === void 0 ? void 0 : payload.content,
-                imageUrl: payload === null || payload === void 0 ? void 0 : payload.imageUrl,
+                content: payload.content,
+                imageUrl: payload.imageUrl,
                 author: { connect: { id: ctx.user.id } },
             }
         });
+        return tweet;
     })
 };
+const extraResolvers = {
+    Tweet: {
+        author: (parent) => db_1.prismaClient.user.findUnique({ where: { id: parent.authorId } }),
+    }
+};
+exports.resolvers = { mutations, extraResolvers, queries };

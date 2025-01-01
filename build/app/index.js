@@ -20,6 +20,7 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const index_1 = require("../app/users/index");
 const jwt_1 = __importDefault(require("../services/jwt"));
+const index_2 = require("../app/tweets/index");
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = (0, express_1.default)();
@@ -29,13 +30,19 @@ function initServer() {
             typeDefs: `
         ${index_1.User.types}
 
+        ${index_2.Tweet.types}
+
         type Query {
           ${index_1.User.queries}
+          ${index_2.Tweet.queries}
+        }
+        
+        
+        type Mutation {
+         ${index_2.Tweet.mutations}
         }
    `,
-            resolvers: {
-                Query: Object.assign({}, index_1.User.resolvers.queries),
-            },
+            resolvers: Object.assign(Object.assign({ Query: Object.assign(Object.assign({}, index_1.User.resolvers.queries), index_2.Tweet.resolvers.queries), Mutation: Object.assign({}, index_2.Tweet.resolvers.mutations) }, index_2.Tweet.resolvers.extraResolvers), index_1.User.resolvers.extraResolvers),
         });
         // Note you must call `start()` on the `ApolloServer`
         // instance before passing the instance to `expressMiddleware`
