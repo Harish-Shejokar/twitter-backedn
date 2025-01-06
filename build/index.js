@@ -13,8 +13,9 @@ const app_1 = require("./app");
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = yield (0, app_1.initServer)();
-        app.listen(8000, () => {
-            console.log(`server working on PORT - 8000`);
+        const port = process.env.PORT || 8000;
+        app.listen(port, () => {
+            console.log(`server working on PORT - ${port}`);
         });
     });
 }

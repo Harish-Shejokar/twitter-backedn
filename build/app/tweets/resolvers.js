@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 const db_1 = require("../../clients/db");
 const queries = {
-    getAllTweets: () => __awaiter(void 0, void 0, void 0, function* () { return db_1.prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }); })
+    getAllTweets: () => db_1.prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
 };
 const mutations = {
     createTweet: (parent_1, _a, ctx_1) => __awaiter(void 0, [parent_1, _a, ctx_1], void 0, function* (parent, { payload }, ctx) {
@@ -24,14 +24,14 @@ const mutations = {
                 content: payload.content,
                 imageUrl: payload.imageUrl,
                 author: { connect: { id: ctx.user.id } },
-            }
+            },
         });
         return tweet;
-    })
+    }),
 };
 const extraResolvers = {
     Tweet: {
         author: (parent) => db_1.prismaClient.user.findUnique({ where: { id: parent.authorId } }),
-    }
+    },
 };
 exports.resolvers = { mutations, extraResolvers, queries };
