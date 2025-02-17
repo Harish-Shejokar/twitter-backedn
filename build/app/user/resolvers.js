@@ -22,13 +22,10 @@ const queries = {
         const googleOauthUrl = new URL("https://oauth2.googleapis.com/tokeninfo");
         googleOauthUrl.searchParams.set("id_token", googleToken);
         const { data } = yield axios_1.default.get(googleOauthUrl.toString(), {
-            responseType: "json",
+            responseType: 'json'
         });
-        if (!(data === null || data === void 0 ? void 0 : data.email)) {
-            throw new Error("Email not found");
-        }
         const user = yield db_1.prismaClient.user.findUnique({
-            where: { email: data.email },
+            where: { email: data.email }
         });
         if (!user) {
             yield db_1.prismaClient.user.create({
@@ -36,37 +33,39 @@ const queries = {
                     email: data.email,
                     firstName: data.given_name,
                     lastName: data.family_name,
-                    profileImageUrl: data.picture,
-                },
+                    profileImageURL: data.picture
+                }
             });
         }
         const userInDb = yield db_1.prismaClient.user.findUnique({
-            where: { email: data.email },
+            where: { email: data.email }
         });
         if (!userInDb) {
-            throw new Error("User not find with Email");
+            throw new Error("User not found with Email");
         }
-        const userToken = jwt_1.default.genrateTokenForUser(userInDb);
+        const userToken = yield jwt_1.default.genrateTokenForUser(user);
         return userToken;
     }),
     getCurrentUser: (parent, args, ctx) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
-        try {
-            const id = (_a = ctx === null || ctx === void 0 ? void 0 : ctx.user) === null || _a === void 0 ? void 0 : _a.id;
-            if (!id)
-                return null;
-            const user = yield db_1.prismaClient.user.findUnique({ where: { id } });
-            return user;
-        }
-        catch (error) {
-            console.log("getCurrentUser--", error);
+        const id = (_a = ctx.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!id)
             return null;
-        }
+        const user = yield db_1.prismaClient.user.findUnique({ where: { id }, });
+        return user;
     }),
+    getUserById: (parent_1, _a, ctx_1) => __awaiter(void 0, [parent_1, _a, ctx_1], void 0, function* (parent, { id }, ctx) {
+        // if (!id) return throw new Error(`enter valid id`);
+        const user = yield db_1.prismaClient.user.findUnique({ where: { id } });
+        // if (!user) {
+        //     return throw new Error(`user not fount by - ID`);
+        // }
+        return user;
+    })
 };
-const extraResolvers = {
+const extraResolver = {
     User: {
         tweets: (parent) => db_1.prismaClient.tweet.findMany({ where: { author: { id: parent.id } } })
-    }
+    },
 };
-exports.resolvers = { queries, extraResolvers };
+exports.resolvers = { queries, extraResolver };

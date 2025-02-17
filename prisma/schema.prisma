@@ -9,24 +9,27 @@ datasource db {
 
 
 
-model user {
-  id              String   @id
-  firstName       String
-  lastName        String?
-  email           String   @unique(map: "User_email_key")
-  profileImageUrl String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime
-  tweets tweet[]
-}
-
-model tweet {
-  id        String   @id
-  content   String
-  imageUrl  String?
-  authorId  String
-  author    user  @relation(fields: [authorId], references: [id])
+model User{
+  id String @id @default(cuid())
+  firstName String
+  lastName String?
+  email String @unique
+  profileImageURL String?
 
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
+
+  tweets Tweet[]
+}
+
+model Tweet{
+  id String @id @default(cuid())
+  content String
+  imageURL String?
+
+  author User @relation(fields: [authorId], references : [id])
+  authorId String
+
+   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

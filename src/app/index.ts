@@ -3,10 +3,10 @@ import { expressMiddleware } from "@apollo/server/express4";
 import cors from 'cors';
 import express from "express";
 import bodyParser from "body-parser";
-import { User } from "../app/users/index"
+import { User } from "./user";
 import { GraphqlContext } from "./interfaces";
 import JWTServices from "../services/jwt";
-import { Tweet } from "../app/tweets/index";
+import { Tweet } from "./tweet";
 
 export async function initServer() {
   const app = express();
@@ -14,20 +14,19 @@ export async function initServer() {
   app.use(cors());
   const graphqlServer = new ApolloServer<GraphqlContext>({
 
-    typeDefs: `
+    typeDefs: `   
         ${User.types}
-
         ${Tweet.types}
 
         type Query {
           ${User.queries}
           ${Tweet.queries}
         }
-        
-        
+         
         type Mutation {
-         ${Tweet.mutations}
+          ${Tweet.mutations},
         }
+        
    `,
     resolvers: {
       Query: {
@@ -39,8 +38,10 @@ export async function initServer() {
         ...Tweet.resolvers.mutations,
       },
 
-      ...Tweet.resolvers.extraResolvers,
-      ...User.resolvers.extraResolvers,
+      ...Tweet.resolvers.extraResolver,
+      ...User.resolvers.extraResolver,
+
+
 
     },
   });
@@ -52,7 +53,8 @@ export async function initServer() {
     context: async ({ req, res }) => {
       return { user: req.headers.authorization ? JWTServices.decodeToken(req.headers.authorization.split('Bearer ')[1]) : undefined };
     },
-  }));
+  }
+  ));
 
   return app;
 }

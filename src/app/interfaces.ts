@@ -6,3 +6,5 @@ export interface JWTUser {
 export interface GraphqlContext{
     user? : JWTUser;
 }
+
+// ?-mark mean that user "can be" or type - JWTUser

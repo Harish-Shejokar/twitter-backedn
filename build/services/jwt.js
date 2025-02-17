@@ -8,8 +8,8 @@ const jwtSecret = process.env.JWT_SECRET;
 class JWTServices {
     static genrateTokenForUser(User) {
         const payload = {
-            id: User.id,
-            email: User.email,
+            id: User === null || User === void 0 ? void 0 : User.id,
+            email: User === null || User === void 0 ? void 0 : User.email,
         };
         const token = jsonwebtoken_1.default.sign(payload, jwtSecret);
         return token;
